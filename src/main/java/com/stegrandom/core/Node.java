@@ -1,28 +1,29 @@
 package com.stegrandom.core;
 
-import java.util.List;
+import java.util.*;
 
 public class Node {
-    private List<Double> dataPoints;    // The data points that reach this node
+    private Dataset dataPoints; // The data points that reach this node
     private String predictedClass;
-    private Node leftNode;
-    private Node rightNode;
-    private String leafValue;           // The decision/value at this node
+    Map<String, Node> children; // null if leaf
+    private String leafValue; // The decision/value at this node
 
-    public Node(List<Double> dataPoints, String predictedClass, Node leftNode, Node rightNode, String leafValue) {
+    public Node() {
+
+    }
+
+    public Node(Dataset dataPoints, String predictedClass, String leafValue) {
         this.dataPoints = dataPoints;
         this.predictedClass = predictedClass;
-        this.leftNode = leftNode;
-        this.rightNode = rightNode;
         this.leafValue = leafValue;
     }
 
-    public List<Double> getDataPoints() {
+    public Dataset getDataPoints() {
         return dataPoints;
     }
 
-    public void setDataPoints(List<Double> dataPoints) {
-        this.dataPoints = dataPoints;
+    public void setDataPoints(Dataset splitResult) {
+        this.dataPoints = splitResult;
     }
 
     public String getPredictedClass() {
@@ -33,14 +34,6 @@ public class Node {
         this.predictedClass = predictedClass;
     }
 
-    public Node getRightNode() {
-        return rightNode;
-    }
-
-    public void setRightNode(Node rightNode) {
-        this.rightNode = rightNode;
-    }
-
     public String getLeafValue() {
         return leafValue;
     }
@@ -49,15 +42,15 @@ public class Node {
         this.leafValue = leafValue;
     }
 
-    public Node getLeftNode() {
-        return leftNode;
-    }
-
-    public void setLeftNode(Node leftNode) {
-        this.leftNode = leftNode;
-    }
-
     public boolean isLeaf() {
-        return leafValue != null;
+        return children == null;
+    }
+
+    public Map<String, Node> getChildren() {
+        return children;
+    }
+
+    public void setChildren(Map<String, Node> children) {
+        this.children = children;
     }
 }

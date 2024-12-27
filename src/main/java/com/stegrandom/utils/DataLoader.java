@@ -13,8 +13,44 @@ public class DataLoader {
         this.filePath = filePath;
     }
 
-    public Object[][] load() throws IOException {
-        Object[][] features = null;
+    // Handles both continuous and categorical values
+    // public Object[][] load() throws IOException {
+    // Object[][] features = null;
+    // // Create a buffered reader to efficiently read the file
+    // try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+    // // Read the header line first - it contains feature names
+    // String headerLine = reader.readLine();
+    // if (headerLine != null) {
+    // // Split the header line to get feature names
+    // String[] headers = headerLine.split(",");
+
+    // // Create a list to store all data rows
+    // List<Object[]> dataRows = new ArrayList<>();
+
+    // // Read the rest of the file line by line
+    // String line;
+    // while ((line = reader.readLine()) != null) {
+    // // Split each line into an array of values
+    // String[] values = line.split(",");
+    // Object[] typedValues = new Object[values.length];
+
+    // for (int i = 0; i < values.length; i++) {
+    // typedValues[i] = parseValue(values[i]);
+    // }
+
+    // dataRows.add(typedValues);
+    // }
+
+    // // Convert list to array for easier processing
+    // features = dataRows.toArray(new Object[0][]);
+    // }
+    // }
+    // return features;
+    // }
+
+    // Assumes all features in the dataset are categorical
+    public String[][] load() throws IOException {
+        String[][] features = null;
         // Create a buffered reader to efficiently read the file
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             // Read the header line first - it contains feature names
@@ -24,24 +60,18 @@ public class DataLoader {
                 String[] headers = headerLine.split(",");
 
                 // Create a list to store all data rows
-                List<Object[]> dataRows = new ArrayList<>();
+                List<String[]> dataRows = new ArrayList<>();
 
                 // Read the rest of the file line by line
                 String line;
                 while ((line = reader.readLine()) != null) {
                     // Split each line into an array of values
                     String[] values = line.split(",");
-                    Object[] typedValues = new Object[values.length];
-
-                    for (int i = 0; i < values.length; i++) {
-                        typedValues[i] = parseValue(values[i]);
-                    }
-
-                    dataRows.add(typedValues);
+                    dataRows.add(values);
                 }
 
                 // Convert list to array for easier processing
-                features = dataRows.toArray(new Object[0][]);
+                features = dataRows.toArray(new String[0][]);
             }
         }
         return features;
