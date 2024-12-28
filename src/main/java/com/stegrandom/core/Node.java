@@ -17,6 +17,10 @@ public class Node {
         this.splitFeatureIndex = featureIndex;
     }
 
+    public int getSplitFeatureIndex() {
+        return splitFeatureIndex;
+    }
+
     public Dataset getDataPoints() {
         return dataPoints;
     }

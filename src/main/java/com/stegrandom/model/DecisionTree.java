@@ -1,18 +1,17 @@
 package com.stegrandom.model;
 
 import com.stegrandom.core.Node;
+import com.stegrandom.core.TrainingConfig;
 import com.stegrandom.core.Dataset;
 
 import java.util.*;
 
 public class DecisionTree {
   private Node root;
-  private int minSamplesAllowed;
-  private int maxDepthAllowed;
-  private double minEntropyDecreaseAllowed;
+  private TrainingConfig config;
 
   public DecisionTree() {
-    this.currentDepth = 0;
+    this.root = new Node(null);
   }
 
   public Node getRoot() {
@@ -23,17 +22,6 @@ public class DecisionTree {
     this.root = root;
   }
 
-  public void decidePrePruningDefaults(double initialEntropy, int n) {
-    // Decide minSampels as the square root of the number of samples/10
-    // Decide maxDepth as the log2 of the number of features
-    // if initial entropy (at the root node) is E, then setting min_entropy_decrease
-    // to E/100
-
-    minSamplesAllowed = (int) Math.sqrt(n) / 10;
-    maxDepthAllowed = (int) Math.log(n);
-    minEntropyDecreaseAllowed = (initialEntropy / 100);
-  }
-
   public void train(Object[][] features, Object[] labels) {
   }
 
@@ -41,44 +29,11 @@ public class DecisionTree {
 
   }
 
-  public String[] predict(String[][] testData) {
-    // Create an array to hold predictions for each row
-    String[] predictions = new String[testData.length];
-
-    // For each row in our test data
-    for (int i = 0; i < testData.length; i++) {
-      // Get prediction for this single row using our private predict method
-      predictions[i] = predict(testData[i]);
-    }
-
-    return predictions;
-  }
-
-  private String predict(String[] row) {
-    // Start at the root of the decision tree
-    Node currentNode = root;
-
-    // Keep moving down the tree until hitting a leaf
-    while (!currentNode.isLeaf()) {
-      // Get the feature value from the test row using the node's split feature
-      String featureValue = row[currentNode.getSplitFeatureIndex()];
-      Node nextNode = currentNode.getNextNode(featureValue);
-
-      // If can't find a matching child node, stop here and use current node's
-      // majority class
-      if (nextNode == null) {
-        break;
-      }
-
-      // Use that value to move to the next node
-      currentNode = nextNode;
-    }
-
-    // Once a leaf is reached, return its prediction
-    return currentNode.getPredictedClass();
-  }
-
   public void fit(String[][] features, String[] target, int depth) {
+    // Calculate initial entropy once
+    double initialEntropy = Metrics.calculateEntropy(features, target);
+    this.config = new TrainingConfig(initialEntropy, features.length);
+    // Start the recursive process
     fit(root, features, target, depth);
   }
 
@@ -112,16 +67,30 @@ public class DecisionTree {
   // Checks if there's full purety or any of the prepruning conditions is
   // activated
   private boolean shouldStopSplitting(String[][] features, String[] target, int bestFeatureIndex, int depth) {
-    // Base cases
-    if (isPure(target) || depth >= maxDepthAllowed || features.length < minSamplesAllowed)
+    // First, check for the pure subset case
+    if (isPure(target)) {
       return true;
+    }
 
-    double bestFeatureEntropy = Metrics.calculateEntropyAfterSplit(features, target, bestFeatureIndex);
-
-    // Check if the split gives sufficient entropy decrease
-    if (Metrics.calculateEntropy(features, target) - bestFeatureEntropy < minEntropyDecreaseAllowed)
+    // Check depth and sample size against pre-configured limits
+    // These limits are calcualted in the TrainingConfig class
+    if (depth >= config.getMaxDepthAllowed() ||
+        features.length < config.getMinSamplesAllowed()) {
       return true;
+    }
 
+    // Calculate entropy decrease to see if this split is worthwhile
+    double currentEntropy = Metrics.calculateEntropy(features, target);
+    double entropyAfterSplit = Metrics.calculateEntropyAfterSplit(features, target, bestFeatureIndex);
+    double entropyDecrease = currentEntropy - entropyAfterSplit;
+
+    // Compare against our minimum entropy decrease threshold
+    // If the decrease is too small, it's not worth making this split
+    if (entropyDecrease < config.getMinEntropyDecreaseAllowed()) {
+      return true;
+    }
+
+    // If all stopping conditions are passed, we should continue splitting
     return false;
   }
 
@@ -219,4 +188,40 @@ public class DecisionTree {
     return bestFeatureIndex;
   }
 
+  public String[] predict(String[][] testData) {
+    // Create an array to hold predictions for each row
+    String[] predictions = new String[testData.length];
+
+    // For each row in our test data
+    for (int i = 0; i < testData.length; i++) {
+      // Get prediction for this single row using our private predict method
+      predictions[i] = predict(testData[i]);
+    }
+
+    return predictions;
+  }
+
+  private String predict(String[] row) {
+    // Start at the root of the decision tree
+    Node currentNode = root;
+
+    // Keep moving down the tree until hitting a leaf
+    while (!currentNode.isLeaf()) {
+      // Get the feature value from the test row using the node's split feature
+      String featureValue = row[currentNode.getSplitFeatureIndex()];
+      Node nextNode = currentNode.getNextNode(featureValue);
+
+      // If can't find a matching child node, stop here and use current node's
+      // majority class
+      if (nextNode == null) {
+        break;
+      }
+
+      // Use that value to move to the next node
+      currentNode = nextNode;
+    }
+
+    // Once a leaf is reached, return its prediction
+    return currentNode.getPredictedClass();
+  }
 }
