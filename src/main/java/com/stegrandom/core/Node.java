@@ -5,17 +5,16 @@ import java.util.*;
 public class Node {
     private Dataset dataPoints; // The data points that reach this node
     private String predictedClass;
-    Map<String, Node> children; // null if leaf
-    private String leafValue; // The decision/value at this node
+    Map<String, Node> children; // empty if leaf
+    private Integer splitFeatureIndex;
 
-    public Node() {
-
+    public Node(Dataset dataPoints) {
+        this.dataPoints = dataPoints;
+        this.children = new HashMap<>();
     }
 
-    public Node(Dataset dataPoints, String predictedClass, String leafValue) {
-        this.dataPoints = dataPoints;
-        this.predictedClass = predictedClass;
-        this.leafValue = leafValue;
+    public void setSplitFeatureIndex(int featureIndex) {
+        this.splitFeatureIndex = featureIndex;
     }
 
     public Dataset getDataPoints() {
@@ -34,16 +33,8 @@ public class Node {
         this.predictedClass = predictedClass;
     }
 
-    public String getLeafValue() {
-        return leafValue;
-    }
-
-    public void setLeafValue(String leafValue) {
-        this.leafValue = leafValue;
-    }
-
     public boolean isLeaf() {
-        return children == null;
+        return children.isEmpty(); // A leaf node has no children
     }
 
     public Map<String, Node> getChildren() {
@@ -52,5 +43,10 @@ public class Node {
 
     public void setChildren(Map<String, Node> children) {
         this.children = children;
+    }
+
+    // During prediction
+    public Node getNextNode(String featureValue) {
+        return children != null ? children.get(featureValue) : null;
     }
 }
