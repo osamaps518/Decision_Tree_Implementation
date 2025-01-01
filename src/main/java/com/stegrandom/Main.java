@@ -3,14 +3,52 @@ package com.stegrandom;
 import java.util.*;
 
 import com.stegrandom.model.DecisionTree;
+import com.stegrandom.model.InformationTheoryMetrics;
 
 public class Main {
     public static void main(String[] args) {
-        String[] array = { "value1", "value1", "value2", "value3" };
-        Set<String> uniqueValues = new HashSet<>(Arrays.asList(array));
-        System.out.println(Arrays.asList(uniqueValues.toString()));
+        // String[] array = { "value1", "value1", "value2", "value3" };
+        // Set<String> uniqueValues = new HashSet<>(Arrays.asList(array));
+        // System.out.println(Arrays.asList(uniqueValues.toString()));
+        //
+        // System.out.println("Hello world!");
 
-        System.out.println("Hello world!");
+        // Example data
+        // String[][] x = {
+        // { "sunny", "hot", "high", "false" },
+        // { "sunny", "hot", "high", "true" },
+        // { "overcast", "hot", "high", "false" },
+        // { "rainy", "mild", "high", "false" },
+        // { "rainy", "cool", "normal", "false" }
+        // };
+        // String[] y = { "no", "no", "yes", "yes", "yes" };
+
+        // double entropy = InformationTheoryMetrics.calculateEntropy(x, y);
+        // System.out.println("Entropy: " + entropy);
+
+        // double informationGain = InformationTheoryMetrics.calculateInformationGain(0,
+        // x, y);
+        // System.out.println("Information Gain: " + informationGain);
+
+        // double accuracy = InformationTheoryMetrics.calculateAccuracy(new double[] {
+        // 1, 0, 1, 1 },
+        // new double[] { 1, 0, 0, 1 });
+        // System.out.println("Accuracy: " + accuracy);
+
+        // double precision = InformationTheoryMetrics.calculatePrecision(new double[] {
+        // 1, 0, 1, 1 },
+        // new double[] { 1, 0, 0, 1 });
+        // System.out.println("Precision: " + precision);
+
+        // double recall = InformationTheoryMetrics.calculateRecall(new double[] { 1, 0,
+        // 1, 1 },
+        // new double[] { 1, 0, 0, 1 });
+        // System.out.println("Recall: " + recall);
+
+        // double fScore = InformationTheoryMetrics.calculateFScore(new double[] { 1, 0,
+        // 1, 1 },
+        // new double[] { 1, 0, 0, 1 });
+        // System.out.println("F-Score: " + fScore);
     }
 
     public void testModel(String[][] trainX, String[] trainY,
@@ -30,13 +68,14 @@ public class Main {
                 .mapToDouble(label -> label.equals("positive") ? 1.0 : 0.0)
                 .toArray();
 
-        // Calculate and display all metrics
-        Metrics metrics = new MetricsImplementation(); // Motyam implementation
-
-        double accuracy = metrics.calculateAccuracy(actualValuesDouble, predictedValuesDouble);
-        double precision = metrics.calculatePrecision(actualValuesDouble, predictedValuesDouble);
-        double recall = metrics.calculateRecall(actualValuesDouble, predictedValuesDouble);
-        double fscore = metrics.calculateFScore(actualValuesDouble, predictedValuesDouble);
+        double accuracy = InformationTheoryMetrics.calculateAccuracy(actualValuesDouble,
+                predictedValuesDouble);
+        double precision = InformationTheoryMetrics.calculatePrecision(actualValuesDouble,
+                predictedValuesDouble);
+        double recall = InformationTheoryMetrics.calculateRecall(actualValuesDouble,
+                predictedValuesDouble);
+        double fscore = InformationTheoryMetrics.calculateFScore(actualValuesDouble,
+                predictedValuesDouble);
 
         System.out.println("Model Performance:");
         System.out.println("Accuracy: " + accuracy);
